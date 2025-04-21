@@ -17,14 +17,14 @@ end entity;
 
 architecture rtl of interfaz_spi is
   type t_estado is (idle, comunicando);
-  signal estado:          t_estado;
-  signal cnt_pulsos_clk:  std_logic_vector(5 downto 0);  -- Hasta 25
-  signal cnt_pulsos_CL:   std_logic_vector(5 downto 0);  -- Hasta 16
-  signal ena_CL:          std_logic;
-  signal ena_rd:          std_logic;
-  signal stop:            std_logic;
-  signal reg_SDAT:        std_logic_vector(15 downto 0);
-  constant T_CL_toggle:   natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
+  signal   estado:         t_estado;
+  signal   cnt_pulsos_clk: std_logic_vector(5 downto 0);  -- Hasta 25
+  signal   cnt_pulsos_CL:  std_logic_vector(5 downto 0);  -- Hasta 16
+  signal   ena_CL:         std_logic;
+  signal   ena_rd:         std_logic;
+  signal   stop:           std_logic;
+  signal   reg_SDAT:       std_logic_vector(15 downto 0);
+  constant T_CL_toggle:    natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
 
   begin 
 
