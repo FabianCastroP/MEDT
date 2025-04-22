@@ -7,7 +7,7 @@ entity temporizador_lectura is
   port(
     clk:           in     std_logic;
     nRst:          in     std_logic;
-    cambio_estado: in     std_logic;
+    cambio_estado: in     std_logic;  -- key0
     tic_spi:       buffer std_logic;                    -- Habilitacion comunicacion SPI
     T_tic_spi:     buffer std_logic_vector(3 downto 0)  -- Periodo en binario natural
   );
@@ -29,6 +29,7 @@ begin
     if nRst = '0' then
       cnt_pulsos_clk <= (others => '0');
       estado         <= T_4s;  -- Hito 1
+      T_tic_spi <= "0100";
   
     elsif clk'event and clk = '1' then
       case estado is
@@ -76,7 +77,6 @@ begin
         cnt_pulsos_clk <= (0 => '1', others => '0');
       
       else
-        tic_spi <= '1';
         cnt_pulsos_clk <= cnt_pulsos_clk + 1;
       
       end if;
@@ -97,12 +97,12 @@ begin
 
       elsif cnt_pulsos_clk = periodo_2s then
 
-        if cnt_2seg < T_tic_spi then
+        if cnt_2seg < (T_tic_spi/2) then
           cnt_pulsos_clk <= cnt_pulsos_clk + 1;
         
         else
-          cnt_pulsos_clk <= (0 => '1', others => '0');
-        
+          cnt_2seg <= (0 => '1', others => '0');
+          tic_spi <= '1';
         end if;
       end if;
     end if;
