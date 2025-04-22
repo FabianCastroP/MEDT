@@ -19,11 +19,11 @@ architecture rtl of interfaz_spi is
   type t_estado is (idle, comunicando);
   signal   estado:         t_estado;
   signal   cnt_pulsos_clk: std_logic_vector(5 downto 0);  -- Hasta 25
-  signal   cnt_pulsos_CL:  std_logic_vector(5 downto 0);  -- Hasta 16
+  signal   cnt_pulsos_CL:  std_logic_vector(3 downto 0);  -- Hasta 9
   signal   ena_CL:         std_logic;
   signal   ena_rd:         std_logic;
   signal   stop:           std_logic;
-  signal   reg_SDAT:       std_logic_vector(15 downto 0);
+  signal   reg_SDAT:       std_logic_vector(8 downto 0);
   constant T_CL_toggle:    natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
 
   begin 
@@ -93,7 +93,7 @@ architecture rtl of interfaz_spi is
       if ena_CL = '1' and stop = '0' then
         if ena_rd = '1' then
         
-          if cnt_pulsos_CL < 16 then
+          if cnt_pulsos_CL < 9 then
             cnt_pulsos_CL <= cnt_pulsos_CL + 1;
           
           else
@@ -108,7 +108,7 @@ architecture rtl of interfaz_spi is
     end if;
   end process;
   
-  stop <= '1' when (cnt_pulsos_CL = 16) and cnt_pulsos_clk = (T_CL_toggle - 1) else
+  stop <= '1' when (cnt_pulsos_CL = 9) and cnt_pulsos_clk = (T_CL_toggle - 1) else
           '0';
 
   process(clk, nRst)
@@ -144,7 +144,7 @@ architecture rtl of interfaz_spi is
       if tic = '1' then
         reg_SDAT <= (others => '0');
       elsif ena_rd = '1' then
-        reg_SDAT <= reg_SDAT(14 downto 0) & SDAT;
+        reg_SDAT <= reg_SDAT(7 downto 0) & SDAT;
       
       end if;
     end if;

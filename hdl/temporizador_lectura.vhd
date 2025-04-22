@@ -97,7 +97,7 @@ begin
 
       elsif cnt_pulsos_clk = periodo_2s then
 
-        if cnt_2seg < (T_tic_spi/2) then
+        if cnt_2seg < (T_tic_spi(3 downto 1)) then
           cnt_pulsos_clk <= cnt_pulsos_clk + 1;
         
         else
