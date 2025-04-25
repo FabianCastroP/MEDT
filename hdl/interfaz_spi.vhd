@@ -20,7 +20,6 @@ architecture rtl of interfaz_spi is
   signal   estado:         t_estado;
   signal   cnt_pulsos_clk: std_logic_vector(5 downto 0);  -- Hasta 25
   signal   cnt_pulsos_CL:  std_logic_vector(3 downto 0);  -- Hasta 9
-  signal   ena_CL:         std_logic;
   signal   ena_rd:         std_logic;
   signal   stop:           std_logic;
   signal   reg_SDAT:       std_logic_vector(8 downto 0);
@@ -51,9 +50,6 @@ architecture rtl of interfaz_spi is
     end if;
   end process;
 
-  ena_CL <= '0' when estado = idle else
-            '1';
-
   CS <= '1' when estado = idle else
         '0';
 
@@ -65,7 +61,7 @@ architecture rtl of interfaz_spi is
       cnt_pulsos_clk <= (others => '0');
   
     elsif clk'event and clk = '1' then
-      if ena_CL = '1' and stop = '0' then
+      if CS = '0' and stop = '0' then
       
         if cnt_pulsos_clk < T_CL_toggle then
             cnt_pulsos_clk <= cnt_pulsos_clk + 1;
@@ -90,7 +86,7 @@ architecture rtl of interfaz_spi is
       cnt_pulsos_CL <= (others => '0');
   
     elsif clk'event and clk = '1' then
-      if ena_CL = '1' and stop = '0' then
+      if CS = '0' and stop = '0' then
         if ena_rd = '1' then
         
           if cnt_pulsos_CL < 9 then
