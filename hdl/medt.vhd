@@ -20,6 +20,8 @@ architecture estructural of medt is
   signal cambio_estado: std_logic;
   signal tic_spi:       std_logic;
   signal T_tic_spi:     std_logic_vector(3 downto 0);
+  signal signo:         std_logic;
+  signal temperatura:   std_logic_vector (7 downto 0);
 
 begin
  
@@ -36,12 +38,14 @@ entity work.temporizador_lectura(rtl)
 U_1: 
 entity work.interfaz_spi(rtl)
   port map(
-    clk  => clk,
-    nRst => nRst,
-    tic  => tic_spi,
-    CS   => CS,
-    CL   => CL,
-    SDAT => SDAT
+    clk         => clk,
+    nRst        => nRst,
+    tic         => tic_spi,
+    SDAT        => SDAT,
+    CS          => CS,
+    CL          => CL,
+    signo       => signo,
+    temperatura => temperatura
   );
 
 end estructural;

@@ -6,12 +6,14 @@ use ieee.std_logic_unsigned.all;
 
 entity interfaz_spi is
   port(
-    clk:   in     std_logic;
-    nRst:  in     std_logic;
-    tic:   in     std_logic;
-    CS:    buffer std_logic;
-    CL:    buffer std_logic;
-    SDAT:  in std_logic
+    clk:         in     std_logic;
+    nRst:        in     std_logic;
+    tic:         in     std_logic;
+    SDAT:        in     std_logic;
+    CS:          buffer std_logic;
+    CL:          buffer std_logic;
+    signo:       buffer std_logic;
+    temperatura: buffer std_logic_vector(7 downto 0)
   );
 end entity;
 
@@ -24,6 +26,7 @@ architecture rtl of interfaz_spi is
   signal   ena_cnt:        std_logic;
   signal   stop:           std_logic;
   signal   reg_SDAT:       std_logic_vector(8 downto 0);
+  signal   data_rdy:       std_logic;
   constant T_CL_toggle:    natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
   constant num_bits_rd:    natural := 9;                  -- Numero de bits a leer
 
@@ -155,6 +158,32 @@ architecture rtl of interfaz_spi is
       elsif ena_rd = '1' then
         reg_SDAT <= reg_SDAT(7 downto 0) & SDAT;
       
+      end if;
+    end if;
+  end process;
+
+  data_rdy <= '1' when fdc_bits_rd = '1' and cnt_pulsos_clk = 1 else
+              '0';
+
+  -- Salida temperatura en binario natural tras lectura
+  process(clk, nRst)
+  begin
+
+    if nRst = '0' then
+      signo       <= '0';
+      temperatura <= (others => '0');
+    
+    elsif clk'event and clk = '1' then
+      if data_rdy = '1' then
+        signo <= reg_SDAT(8);
+
+        if reg_SDAT(8) = '1' then
+          temperatura <= (not reg_SDAT(7 downto 0)) + 1;
+
+        else
+          temperatura <= reg_SDAT(7 downto 0);
+
+        end if;
       end if;
     end if;
   end process;

@@ -13,12 +13,14 @@ entity test_interfaz_spi is
 end entity;
 
 architecture test of test_interfaz_spi is
-  signal clk:       std_logic;
-  signal nRst:      std_logic;
-  signal tic:       std_logic;
-  signal CS:        std_logic;
-  signal CL:        std_logic;
-  signal SDAT:      std_logic;
+  signal clk:         std_logic;
+  signal nRst:        std_logic;
+  signal tic:         std_logic;
+  signal SDAT:        std_logic;
+  signal CS:          std_logic;
+  signal CL:          std_logic;
+  signal signo:       std_logic;
+  signal temperatura: std_logic_vector(7 downto 0);
 
 
   signal temp: std_logic_vector(15 downto 0);   
@@ -27,17 +29,18 @@ architecture test of test_interfaz_spi is
 
 begin 
 
-dut: entity work.interfaz_spi(rtl)  -- Completar nombre
-     port map(clk,  -- in
-              nRst, -- in
-              tic,  -- in
-              CS,   -- in
-              CL,   -- in
-              SDAT -- out
-
-              -- Completar resto puertos
-
-              );
+dut:
+entity work.interfaz_spi(rtl)  -- Completar nombre
+  port map(
+    clk,         -- in
+    nRst,        -- in
+    tic,         -- in
+    SDAT,        -- out
+    CS,          -- in
+    CL,          -- in
+    signo,       -- in
+    temperatura  -- in
+  );
 
 process     -- Reloj
 begin
