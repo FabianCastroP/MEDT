@@ -16,8 +16,6 @@ entity interfaz_spi is
 end entity;
 
 architecture rtl of interfaz_spi is
-  type t_estado is (idle, comunicando);
-  signal   estado:         t_estado;
   signal   cnt_pulsos_clk: std_logic_vector(5 downto 0);  -- Hasta 25
   signal   cnt_pulsos_CL:  std_logic_vector(3 downto 0);  -- Hasta 9
   signal   ena_rd:         std_logic;
@@ -27,31 +25,22 @@ architecture rtl of interfaz_spi is
 
   begin 
 
-  -- Maquina de estados para el control de transacciones
+  -- Flip-flop CS
   process(clk, nRst)
   begin
     if nRst = '0' then
-      estado         <= idle;
+      CS <= '1';
 
     elsif clk'event and clk = '1' then
-      case estado is
+      if tic = '1' then
+        CS <= '0';
 
-        when idle =>
-          if tic = '1' then
-            estado <= comunicando;
-          end if;
-
-        when comunicando =>
-          if stop = '1' then
-            estado <= idle;
-          end if;
+      elsif stop = '1' then
+        CS <= '1';
+      end if;
      
-      end case;
     end if;
   end process;
-
-  CS <= '1' when estado = idle else
-        '0';
 
   -- Contador pulsos clk
   process(clk, nRst)
