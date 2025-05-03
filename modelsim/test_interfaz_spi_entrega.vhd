@@ -19,8 +19,8 @@ architecture test of test_interfaz_spi is
   signal SDAT:        std_logic;
   signal CS:          std_logic;
   signal CL:          std_logic;
-  signal signo:       std_logic;
-  signal temperatura: std_logic_vector(7 downto 0);
+  signal data_rdy:    std_logic;
+  signal temperatura: std_logic_vector(8 downto 0);
 
 
   signal temp: std_logic_vector(15 downto 0);   
@@ -38,7 +38,7 @@ entity work.interfaz_spi(rtl)  -- Completar nombre
     SDAT,        -- out
     CS,          -- in
     CL,          -- in
-    signo,       -- in
+    data_rdy,    -- in
     temperatura  -- in
   );
 

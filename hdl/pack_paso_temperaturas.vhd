@@ -1,16 +1,20 @@
-
+-- Comprobar tamaño vector de datos en cada función (C2 9 bits)
+-- Rangos:
+--   - C [-40, 150]  9 bits
+--   - K [233, 423]  10 bits
+--   - F [-41, 304]  10 bits
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 package pack_test_reloj is
   -- Funciones auxiliares
-  function kelvin_a_centigrados(signo: std_logic; temp_K: std_logic_vector(8 downto 0)) return std_logic_vector;
-  function centigrados_a_fahrenheit(signo: std_logic; temp_C: std_logic_vector(7 downto 0)) return std_logic_vector;
+  function kelvin_a_centigrados(temp_K: std_logic_vector(8 downto 0)) return std_logic_vector;
+  function centigrados_a_fahrenheit(temp_C: std_logic_vector(7 downto 0)) return std_logic_vector;
   -- Funciones paso unidades
-  function centigrados_a_kelvin(signo: std_logic; temp_C: std_logic_vector(7 downto 0)) return std_logic_vector;
-  function kelvin_a_fahrenheit(signo: std_logic; temp_K: std_logic_vector(8 downto 0)) return std_logic_vector;
-  function fahrenheit_a_centigrados(signo: std_logic; temp_F: std_logic_vector(8 downto 0)) return std_logic_vector;
+  function centigrados_a_kelvin(temp_C: std_logic_vector(7 downto 0)) return std_logic_vector;
+  function kelvin_a_fahrenheit(temp_K: std_logic_vector(8 downto 0)) return std_logic_vector;
+  function fahrenheit_a_centigrados(temp_F: std_logic_vector(8 downto 0)) return std_logic_vector;
 
 end package;
 
@@ -63,10 +67,14 @@ package body pack_test_reloj is
       else
         resultado := resultado + 32;
       end if;
-
+      
       -- Compruebo si hay que redondear
       if decimales(3) = '1' then
-        resultado := resultado + 1;
+        if resultado(8) = '1' 
+          resultado := resultado - 1; 
+        else
+          resultado := resultado + 1;
+        end if;
       end if;
 
       -- Compruebo rango: [-41, 304]

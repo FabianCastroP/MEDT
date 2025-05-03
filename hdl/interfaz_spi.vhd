@@ -12,7 +12,7 @@ entity interfaz_spi is
     SDAT:        in     std_logic;
     CS:          buffer std_logic;
     CL:          buffer std_logic;
-    -- signo:       buffer std_logic;
+    data_rdy:    buffer std_logic;
     temperatura: buffer std_logic_vector(8 downto 0)  -- Salida no varía hasta data_rdy
   );
 end entity;
@@ -23,10 +23,8 @@ architecture rtl of interfaz_spi is
   signal   fdc_toggle_CL:  std_logic;
   signal   fdc_bits_rd:    std_logic;
   signal   ena_rd:         std_logic;
-  -- signal   ena_cnt:        std_logic;
   signal   stop:           std_logic;
   signal   reg_SDAT:       std_logic_vector(8 downto 0);  -- En C2
-  signal   data_rdy:       std_logic;
   constant T_CL_toggle:    natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
   constant num_bits_rd:    natural := 9;                  -- Numero de bits a leer
 
@@ -48,10 +46,6 @@ architecture rtl of interfaz_spi is
      
     end if;
   end process;
-
-  -- Habilita contador mientras se produce comunicacion
-  -- ena_cnt <= '1' when CS = '0' and stop = '0' else
-  --            '0';
 
   -- Contador pulsos clk
   process(clk, nRst)
@@ -104,6 +98,10 @@ architecture rtl of interfaz_spi is
             cnt_pulsos_CL <= (0 => '1', others => '0');
           
           end if;
+        
+        elsif stop = '1' then
+          cnt_pulsos_CL <= (others => '0');
+
         end if;
         
       else
@@ -133,7 +131,7 @@ architecture rtl of interfaz_spi is
       if tic = '1' then
         CL <= '0';
         
-      elsif CS = '0' then
+      elsif stop = '1' then
         CL <= '1';
       
       elsif fdc_toggle_CL = '1' then
@@ -163,7 +161,7 @@ architecture rtl of interfaz_spi is
     end if;
   end process;
 
-  -- Registro salida datos con conformador de pulso para 
+  -- Registro salida datos con conformador de pulso para data_rdy
   process(clk, nRst)
   begin
 
@@ -173,44 +171,15 @@ architecture rtl of interfaz_spi is
     
     elsif clk'event and clk = '1' then
 
-      if CS = '0' then
-        if fdc_bits_rd = '1' and cnt_pulsos_clk = 1 then
-          temperatura <= reg_SDAT;
-          data_rdy    <= '1';
-        
-        else
-          data_rdy <= '0';
-        
-        end if;
+      if CS = '0' and stop = '1' then
+        temperatura <= reg_SDAT;
+        data_rdy    <= '1';
+
+      else
+        data_rdy <= '0';
+      
       end if;
     end if;
   end process;
-
-  -- -- Recibido último bit de temperatura. Salida de datos estable
-  -- data_rdy <= '1' when fdc_bits_rd = '1' and cnt_pulsos_clk = 1 else
-  --             '0';
-
-  -- Salida temperatura en binario natural tras lectura
-  -- process(clk, nRst)
-  -- begin
-
-  --   if nRst = '0' then
-  --     signo       <= '0';
-  --     temperatura <= (others => '0');
-    
-  --   elsif clk'event and clk = '1' then
-  --     if data_rdy = '1' then
-  --       signo <= reg_SDAT(8);
-
-  --       if reg_SDAT(8) = '1' then
-  --         temperatura <= (not reg_SDAT(7 downto 0)) + 1;
-
-  --       else
-  --         temperatura <= reg_SDAT(7 downto 0);
-
-  --       end if;
-  --     end if;
-  --   end if;
-  -- end process;
 
 end rtl;

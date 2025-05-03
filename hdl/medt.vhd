@@ -20,7 +20,7 @@ architecture estructural of medt is
   signal cambio_estado: std_logic;
   signal tic_spi:       std_logic;
   signal T_tic_spi:     std_logic_vector(3 downto 0);
-  signal signo:         std_logic;
+  signal data_rdy:      std_logic;
   signal temperatura:   std_logic_vector (7 downto 0);
 
 begin
@@ -44,7 +44,7 @@ entity work.interfaz_spi(rtl)
     SDAT        => SDAT,
     CS          => CS,
     CL          => CL,
-    signo       => signo,
+    data_rdy    => data_rdy,
     temperatura => temperatura
   );
 
