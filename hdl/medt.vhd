@@ -21,7 +21,7 @@ architecture estructural of medt is
   signal tic_spi:       std_logic;
   signal T_tic_spi:     std_logic_vector(3 downto 0);
   signal data_rdy:      std_logic;
-  signal temperatura:   std_logic_vector (7 downto 0);
+  signal temperatura:   std_logic_vector (8 downto 0);
 
 begin
  

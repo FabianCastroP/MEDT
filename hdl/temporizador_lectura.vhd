@@ -90,6 +90,7 @@ begin
   
     if nRst = '0' then
       cnt_2seg <= (others => '0');
+      tic_spi <= '0';
   
     elsif clk'event and clk = '1' then
       if cambio_estado = '1' then
@@ -98,7 +99,7 @@ begin
       elsif cnt_pulsos_clk = periodo_2s then
 
         if cnt_2seg < (T_tic_spi(3 downto 1)) then
-          cnt_pulsos_clk <= cnt_pulsos_clk + 1;
+          cnt_2seg <= cnt_2seg + 1;
         
         else
           cnt_2seg <= (0 => '1', others => '0');
