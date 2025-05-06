@@ -7,7 +7,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_signed.all;
 
-package pack_test_reloj is
+package pack_paso_temperaturas is
   -- Funciones paso unidades
   function centigrados_a_kelvin(temp_C: std_logic_vector(8 downto 0)) return std_logic_vector;
   function centigrados_a_fahrenheit(temp_C: std_logic_vector(8 downto 0)) return std_logic_vector;
@@ -15,7 +15,7 @@ package pack_test_reloj is
 
 end package;
 
-package body pack_test_reloj is
+package body pack_paso_temperaturas is
 
   function centigrados_a_fahrenheit(temp_C: std_logic_vector(8 downto 0)) return std_logic_vector is
     variable temp:      std_logic_vector(13 downto 0) := (others => '0');  -- 150*29 = 4350 = 01 0000 1111 1110
@@ -27,7 +27,7 @@ package body pack_test_reloj is
       -- 1.8125 = 29/16 = (16 + 8 + 4 + 1)/16
 
       -- Multiplico por 29
-      temp := (temp_C & "0000") +
+      temp := (temp_C(8) & temp_C & "0000") +
               (temp_C & "000")  +
               (temp_C & "00")   +
               (temp_C);
@@ -40,7 +40,7 @@ package body pack_test_reloj is
       
       -- Compruebo si hay que redondear
       if decimales(3) = '1' then    -- 0.5
-        if resultado(13) = '1' then -- negativo
+        if temp_C(8) = '1' then -- negativo
           resultado := resultado - 1; -- -40.5 -> -41
         else
           resultado := resultado + 1;
@@ -63,7 +63,7 @@ package body pack_test_reloj is
     variable resultado: std_logic_vector(9 downto 0) := (others => '0');
 
     begin
-      resultado := temp_C + 273;
+      resultado := temp_C(8) & temp_C + 273;
 
       return resultado;
   
@@ -108,4 +108,4 @@ package body pack_test_reloj is
 
   end function;
 
-end package body pack_test_reloj;
+end package body pack_paso_temperaturas;
