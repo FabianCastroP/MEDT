@@ -41,6 +41,7 @@ begin
 
   U_1: 
   entity work.temporizador_lectura(rtl)
+  generic map (periodo_2s => 1000)
   port map(
     clk           => clk,
     nRst          => nRst,
