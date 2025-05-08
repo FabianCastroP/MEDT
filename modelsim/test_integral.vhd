@@ -15,8 +15,8 @@ end entity;
 architecture test of test_integral is
   signal clk:          std_logic;
   signal nRst:         std_logic;
-  signal pulsador_der: std_logic;
-  signal pulsador_izq: std_logic;
+  signal key0: std_logic;
+  signal key1: std_logic;
   signal SDAT:         std_logic;
   signal CS:           std_logic;
   signal CL:           std_logic;
@@ -32,8 +32,8 @@ entity work.medt(estructural)  -- Completar nombre
   port map(
     clk,           -- in
     nRst,          -- in
-    pulsador_der,  -- in
-    pulsador_izq,  -- in
+    key0,  -- in
+    key1,  -- in
     SDAT,          -- in
     CS,            -- buffer
     CL,            -- buffer
@@ -126,31 +126,37 @@ process  -- Genera pulsaciones
 
 begin
 
-  pulsador_der <= '1';
-  pulsador_izq <= '1';
+  key0 <= '1';
+  key1 <= '1';
   wait until clk'event and clk = '1';
 
-  pulsador_der <= '0';
-  pulsador_izq <= '0';
+  key0 <= '0';
   wait for 10*T_clk;
   wait until clk'event and clk = '1';
 
-  pulsador_der <= '1';
-  pulsador_izq <= '1';
+  key0 <= '1';
   wait until clk'event and clk = '1';
 
-  pulsador_der <= '0';
+  key0 <= '0';
   wait until clk'event and clk = '1';  
   wait for 10*T_clk;
-  pulsador_der <= '1';
+  key0 <= '1';
   wait until clk'event and clk = '1';  
   
   wait until temp_BCD'event;
-  pulsador_der <= '0';
+  key0 <= '0';
   wait until clk'event and clk = '1';  
   wait for 10*T_clk;
-  pulsador_der <= '1';
+  key0 <= '1';
   wait until clk'event and clk = '1';
+
+  wait until temp_BCD'event;
+  key0 <= '0';
+  wait until clk'event and clk = '1';  
+  wait for 10*T_clk;
+  key0 <= '1';
+  wait until clk'event and clk = '1';
+
   wait;
 
 end process;
@@ -162,3 +168,4 @@ end test;
 
 
   
+

@@ -1,4 +1,4 @@
--- Comprobar tamaÃ±o vector de datos en cada funciÃ³n (C2 9 bits)
+-- Comprobar tamaño vector de datos en cada función (C2 9 bits)
 -- Rangos:
 --   - C [-40, 150]  9 bits
 --   - K [233, 423]  10 bits
@@ -70,42 +70,35 @@ package body pack_paso_temperaturas is
   end function;
 
   function temperatura_a_BCD(temp_C_K_F: std_logic_vector(9 downto 0)) return std_logic_vector is
-    variable resultado: std_logic_vector(11 downto 0) := (others => '0');
-    variable temp: std_logic_vector(9 downto 0) := (others => '0');
-    
-
-    begin
-
-      temp := temp_C_K_F;
-      -- Paso de C2 a binario natural
-      if temp(9) = '1' then
-        temp := (not temp) + 1;
+    variable resultado : std_logic_vector(11 downto 0) := (others => '0');
+    variable temp      : std_logic_vector(9 downto 0) := temp_C_K_F;
+  begin
+    -- Convert from 2's complement to absolute value
+    if temp(9) = '1' then
+      temp := (not temp) + 1;
+    end if;
+  
+    -- Shift-Add-3 algorithm (Double Dabble)
+    for iter in 1 to 10 loop
+      -- Step 1: Add 3 to each BCD digit if it's greater than 4
+      if resultado(3 downto 0) > 4 then
+        resultado(3 downto 0) := resultado(3 downto 0) + 3;
       end if;
-
-      -- Metodo Shift add 3
-      for iter in 1 to 10 loop
-        resultado := resultado(11 downto 1) & temp(9);
-        temp := temp(8 downto 0) & '0';
-        
-        -- Unidades
-        if resultado(3 downto 0) > 4 then
-          resultado(3 downto 0) := resultado(3 downto 0) + 3;
-        end if;
-
-        -- Decenas
-        if resultado(3 downto 0) > 4 then
-          resultado(3 downto 0) := resultado(3 downto 0) + 3;
-        end if;
-
-        -- Centenas
-        if resultado(3 downto 0) > 4 then
-          resultado(3 downto 0) := resultado(3 downto 0) + 3;
-        end if;
-      end loop;
-      
-
+  
+      if resultado(7 downto 4) > 4 then
+        resultado(7 downto 4) := resultado(7 downto 4) + 3;
+      end if;
+  
+      if resultado(11 downto 8) > 4 then
+        resultado(11 downto 8) := resultado(11 downto 8) + 3;
+      end if;
+  
+      -- Step 2: Shift left
+      resultado := resultado(10 downto 0) & temp(9);
+      temp := temp(8 downto 0) & '0';
+    end loop;
+  
     return resultado;
-
   end function;
 
 end package body pack_paso_temperaturas;
