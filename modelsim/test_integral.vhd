@@ -130,31 +130,31 @@ begin
   key1 <= '1';
   wait until clk'event and clk = '1';
 
-  key0 <= '0';
-  wait for 10*T_clk;
+  key1 <= '0';
+  wait for 1000*T_clk;
   wait until clk'event and clk = '1';
 
-  key0 <= '1';
+  key1 <= '1';
   wait until clk'event and clk = '1';
 
-  key0 <= '0';
+  key1 <= '0';
   wait until clk'event and clk = '1';  
-  wait for 10*T_clk;
-  key0 <= '1';
+  wait for 1000*T_clk;
+  key1 <= '1';
   wait until clk'event and clk = '1';  
   
   wait until temp_BCD'event;
-  key0 <= '0';
+  key1 <= '0';
   wait until clk'event and clk = '1';  
-  wait for 10*T_clk;
-  key0 <= '1';
+  wait for 1000*T_clk;
+  key1 <= '1';
   wait until clk'event and clk = '1';
 
   wait until temp_BCD'event;
-  key0 <= '0';
+  key1 <= '0';
   wait until clk'event and clk = '1';  
-  wait for 10*T_clk;
-  key0 <= '1';
+  wait for 1000*T_clk;
+  key1 <= '1';
   wait until clk'event and clk = '1';
 
   wait;
@@ -168,4 +168,5 @@ end test;
 
 
   
+
 
