@@ -6,7 +6,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 entity temporizador_lectura is
-  generic (periodo_2s : natural := 100000000);
+  generic (periodo_2s : natural := 100000000);  -- 100M = 50MHz
   port(
     clk:           in     std_logic;
     nRst:          in     std_logic;
@@ -30,7 +30,7 @@ begin
   begin
   
     if nRst = '0' then
-      estado <= T_4s;  -- Hito 1
+      estado <= T_4s;
       T_tic_spi <= "0100";
   
     elsif clk'event and clk = '1' then

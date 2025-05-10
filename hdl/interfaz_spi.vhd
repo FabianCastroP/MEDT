@@ -5,6 +5,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 entity interfaz_spi is
+  generic (T_CL_toggle : natural := 25);  -- 50MHz/50 = 1MHz -> 25 = semiperiodo
   port(
     clk:         in     std_logic;
     nRst:        in     std_logic;
@@ -25,11 +26,11 @@ architecture rtl of interfaz_spi is
   signal   ena_rd:         std_logic;
   signal   stop:           std_logic;
   signal   reg_SDAT:       std_logic_vector(8 downto 0);  -- En C2
-  constant T_CL_toggle:    natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
+  -- constant T_CL_toggle:    natural := 25;                 -- 50MHz/50 = 1MHz -> 25 = semiperiodo
   constant num_bits_rd:    natural := 9;                  -- Numero de bits a leer
-
+                                                          -- 100 MHz/100 = 1MHz
   begin 
-
+  
   -- Flip-flop CS
   process(clk, nRst)
   begin

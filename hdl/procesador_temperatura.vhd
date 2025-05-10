@@ -8,10 +8,9 @@ entity procesador_temperatura is
   port(
     clk:             in     std_logic;
     nRst:            in     std_logic;
-    data_rdy:        in     std_logic;
-    temperatura_spi: in     std_logic_vector(8 downto 0);  -- ºC con signo
-    T_tic_spi:       in     std_logic_vector(3 downto 0);  -- (2, 4, 6, 8)
+    temperatura_spi: in     std_logic_vector(8 downto 0);  -- C con signo
     cambio_unidades: in     std_logic;
+    unidad:          buffer std_logic_vector(1 downto 0);
     temp_BCD:        buffer std_logic_vector(11 downto 0)  -- [0, 423]
   );
 end entity;
@@ -31,12 +30,6 @@ architecture rtl of procesador_temperatura is
   signal temp_BCD_D:  std_logic_vector(4 downto 0);   -- [0, 9]
   signal temp_BCD_U:  std_logic_vector(8 downto 0);   -- [0, 9]
 
-
-  -- signal reg_temp:        std_logic_vector(9 downto 0);
-  -- signal temp:            std_logic_vector(9 downto 0);
-  -- signal bits_procesados: std_logic_vector(3 downto 0);
-  -- signal resultado:       std_logic_vector(11 downto 0);
-
   begin
 
   process(clk, nRst)
@@ -45,39 +38,41 @@ architecture rtl of procesador_temperatura is
       estado <= centigrados;
     
     elsif clk'event and clk = '1' then
-      case estado is
+      if cambio_unidades = '1' then
+        case estado is
 
-        when centigrados =>
-          if cambio_unidades = '1' then
+          when centigrados =>
             estado <= kelvin;
-          end if;
         
-        when kelvin =>
-          if cambio_unidades = '1' then
+          when kelvin =>
             estado <= fahrenheit;
-          end if;
 
-        when fahrenheit =>
-          if cambio_unidades = '1' then
+          when fahrenheit =>
             estado <= centigrados;
-          end if;
+
+        end case;
+      end if;
     
-      end case;
     end if;
   end process;
 
+  unidad <= "00" when estado = centigrados else
+            "01" when estado = kelvin      else
+            "10";
+
   signo <= temperatura_spi(8);
+
   -- Conversion temperatura --
 
-  -- Kelvin
   temp_K <= (signo & temperatura_spi) + 273;
 
   -- Fahrenheit
   -- TF = TCENT*1.8125 + 32
   -- 1.8125 = 29/16 = (16 + 8 + 4 + 1)/16
-
+  -- -1160
+  -- 
   -- Multiplico por 29
-  temp_F_mult <= (temperatura_spi(8) & temperatura_spi & "0000") +
+  temp_F_mult <= (signo & temperatura_spi & "0000") +
                  (temperatura_spi & "000")  +
                  (temperatura_spi & "00")   +
                  (temperatura_spi);
@@ -93,8 +88,8 @@ architecture rtl of procesador_temperatura is
 
   temp_abs <= not (signo & temperatura_spi) + 1 when estado = centigrados and signo = '1' else
               signo & temperatura_spi           when estado = centigrados and signo = '0' else
-              not (temp_K) + 1                  when estado = kelvin      and signo = '1' else
-              temp_K                            when estado = kelvin      and signo = '0' else
+              -- not (temp_K) + 1                  when estado = kelvin      and signo = '1' else -- Nunca va a ser negativa
+              temp_K                            when estado = kelvin                      else
               not (temp_F) + 1                  when estado = fahrenheit  and signo = '1' else
               temp_F;
   
@@ -104,6 +99,9 @@ architecture rtl of procesador_temperatura is
                 "0001" when temp_abs >= 100 else
                 "0000";
   
+  -- 423
+  -- temp_BCD_C = 4
+  -- aux_temp_BCD_DU = 423 - 400 = 23
   aux_temp_BCD_DU <= (temp_abs(8 downto 0) - 400) when temp_BCD_C = 4 else
                      (temp_abs(8 downto 0) - 300) when temp_BCD_C = 3 else
                      (temp_abs(8 downto 0) - 200) when temp_BCD_C = 2 else
@@ -134,8 +132,6 @@ architecture rtl of procesador_temperatura is
 
   temp_BCD <= temp_BCD_C(3 downto 0) & temp_BCD_D(3 downto 0) & temp_BCD_U(3 downto 0);
                 
-
-
 
 end rtl;
 

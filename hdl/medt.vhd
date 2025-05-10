@@ -1,5 +1,4 @@
 
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
@@ -13,6 +12,7 @@ entity medt is
     SDAT:     in     std_logic;
     CS:       buffer std_logic;
     CL:       buffer std_logic;
+    unidad:   buffer std_logic_vector(1 downto 0);
     temp_BCD: buffer std_logic_vector(11 downto 0)
   );
 end entity;
@@ -28,7 +28,7 @@ architecture estructural of medt is
 
 begin
 
-  U0:
+  U_0:
   entity work.conf_pulsos(rtl)
   port map(
     clk  => clk,
@@ -41,7 +41,7 @@ begin
 
   U_1: 
   entity work.temporizador_lectura(rtl)
-  generic map (periodo_2s => 1000)
+  generic map (periodo_2s => 1000) -- 500 Hz
   port map(
     clk           => clk,
     nRst          => nRst,
@@ -52,6 +52,7 @@ begin
 
   U_2: 
   entity work.interfaz_spi(rtl)
+  generic map (T_CL_toggle => 25)  -- 50MHz
   port map(
     clk         => clk,
     nRst        => nRst,
@@ -68,10 +69,9 @@ begin
   port map(
     clk             => clk,
     nRst            => nRst,
-    data_rdy        => data_rdy,
     temperatura_spi => temperatura,
-    T_tic_spi       => T_tic_spi,
-    cambio_unidades   => pulsador_izq,
+    cambio_unidades => pulsador_izq,
+    unidad          => unidad,
     temp_BCD        => temp_BCD
   );
 

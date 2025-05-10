@@ -20,6 +20,7 @@ architecture test of test_integral is
   signal SDAT:         std_logic;
   signal CS:           std_logic;
   signal CL:           std_logic;
+  signal unidad:       std_logic_vector(1 downto 0); 
   signal temp_BCD:     std_logic_vector(11 downto 0);
   constant T_clk:      time := 20 ns;      
 
@@ -37,6 +38,7 @@ entity work.medt(estructural)  -- Completar nombre
     SDAT,          -- in
     CS,            -- buffer
     CL,            -- buffer
+    unidad,        -- buffer
     temp_BCD       -- buffer
   );
 
@@ -130,34 +132,45 @@ begin
   key1 <= '1';
   wait until clk'event and clk = '1';
 
-  key1 <= '0';
-  wait for 1000*T_clk;
-  wait until clk'event and clk = '1';
+  loop
+    key0 <= not key0;
+    key1 <= not key1;
+    wait for 8000*T_clk;
+    wait until clk'event and clk = '1';
+  end loop;
 
-  key1 <= '1';
-  wait until clk'event and clk = '1';
+  -- key0 <= '1';
+  -- key1 <= '1';
+  -- wait until clk'event and clk = '1';
 
-  key1 <= '0';
-  wait until clk'event and clk = '1';  
-  wait for 1000*T_clk;
-  key1 <= '1';
-  wait until clk'event and clk = '1';  
+  -- key1 <= '0';
+  -- wait for 1000*T_clk;
+  -- wait until clk'event and clk = '1';
+
+  -- key1 <= '1';
+  -- wait until clk'event and clk = '1';
+
+  -- key1 <= '0';
+  -- wait until clk'event and clk = '1';  
+  -- wait for 1000*T_clk;
+  -- key1 <= '1';
+  -- wait until clk'event and clk = '1';  
   
-  wait until temp_BCD'event;
-  key1 <= '0';
-  wait until clk'event and clk = '1';  
-  wait for 1000*T_clk;
-  key1 <= '1';
-  wait until clk'event and clk = '1';
+  -- wait until temp_BCD'event;
+  -- key1 <= '0';
+  -- wait until clk'event and clk = '1';  
+  -- wait for 1000*T_clk;
+  -- key1 <= '1';
+  -- wait until clk'event and clk = '1';
 
-  wait until temp_BCD'event;
-  key1 <= '0';
-  wait until clk'event and clk = '1';  
-  wait for 1000*T_clk;
-  key1 <= '1';
-  wait until clk'event and clk = '1';
+  -- wait until temp_BCD'event;
+  -- key1 <= '0';
+  -- wait until clk'event and clk = '1';  
+  -- wait for 1000*T_clk;
+  -- key1 <= '1';
+  -- wait until clk'event and clk = '1';
 
-  wait;
+  -- wait;
 
 end process;
 
