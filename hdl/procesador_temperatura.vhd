@@ -11,6 +11,7 @@ entity procesador_temperatura is
     temperatura_spi: in     std_logic_vector(8 downto 0);  -- C con signo
     cambio_unidades: in     std_logic;
     unidad:          buffer std_logic_vector(1 downto 0);
+    signo:           buffer std_logic;
     temp_BCD:        buffer std_logic_vector(11 downto 0)  -- [0, 423]
   );
 end entity;
@@ -18,7 +19,7 @@ end entity;
 architecture rtl of procesador_temperatura is
   type   t_estado is (centigrados, kelvin, fahrenheit);
   signal estado:      t_estado;
-  signal signo:       std_logic;  -- negativo = 1
+  -- signal signo:       std_logic;  -- negativo = 1
   signal temp_K:      std_logic_vector(9 downto 0);   -- [233, 423]
   signal temp_F_mult: std_logic_vector(13 downto 0);  -- 150*29 = 4350 = 01 0000 1111 1110
   signal temp_F_div:  std_logic_vector(9 downto 0);
@@ -60,7 +61,8 @@ architecture rtl of procesador_temperatura is
             "01" when estado = kelvin      else
             "10";
 
-  signo <= temperatura_spi(8);
+  signo <= temperatura_spi(8) when estado /= kelvin else
+           '0';
 
   -- Conversion temperatura --
 
@@ -72,7 +74,7 @@ architecture rtl of procesador_temperatura is
   -- -1160
   -- 
   -- Multiplico por 29
-  temp_F_mult <= (signo & temperatura_spi & "0000") +
+  temp_F_mult <= (temperatura_spi(8) & temperatura_spi & "0000") +
                  (temperatura_spi & "000")  +
                  (temperatura_spi & "00")   +
                  (temperatura_spi);
@@ -82,15 +84,15 @@ architecture rtl of procesador_temperatura is
   redondeo   <= temp_F_mult(3);
 
   -- Sumo 32 y redondeo
-  temp_F <= (temp_F_div + 32) - 1 when signo = '1' and redondeo = '1' else
-            (temp_F_div + 32) + 1 when signo = '0' and redondeo = '1' else
+  temp_F <= (temp_F_div + 32) - 1 when temperatura_spi(8) = '1' and redondeo = '1' else
+            (temp_F_div + 32) + 1 when temperatura_spi(8) = '0' and redondeo = '1' else
             (temp_F_div + 32);
 
-  temp_abs <= not (signo & temperatura_spi) + 1 when estado = centigrados and signo = '1' else
-              signo & temperatura_spi           when estado = centigrados and signo = '0' else
+  temp_abs <= not (temperatura_spi(8) & temperatura_spi) + 1 when estado = centigrados and temperatura_spi(8) = '1' else
+              temperatura_spi(8) & temperatura_spi           when estado = centigrados and temperatura_spi(8) = '0' else
               -- not (temp_K) + 1                  when estado = kelvin      and signo = '1' else -- Nunca va a ser negativa
               temp_K                            when estado = kelvin                      else
-              not (temp_F) + 1                  when estado = fahrenheit  and signo = '1' else
+              not (temp_F) + 1                  when estado = fahrenheit  and temperatura_spi(8) = '1' else
               temp_F;
   
   temp_BCD_C <= "0100" when temp_abs >= 400 else
