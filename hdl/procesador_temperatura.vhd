@@ -134,4 +134,3 @@ architecture rtl of procesador_temperatura is
                 
 
 end rtl;
-
