@@ -61,8 +61,9 @@ architecture rtl of procesador_temperatura is
             "01" when estado = kelvin      else
             "10";
 
-  signo <= temperatura_spi(8) when estado /= kelvin else
+  signo <= temperatura_spi(8) when estado = centigrados or (estado = fahrenheit and temperatura_spi < -17) else
            '0';
+        
 
   -- Conversion temperatura --
 
@@ -88,11 +89,11 @@ architecture rtl of procesador_temperatura is
             (temp_F_div + 32) + 1 when temperatura_spi(8) = '0' and redondeo = '1' else
             (temp_F_div + 32);
 
-  temp_abs <= not (temperatura_spi(8) & temperatura_spi) + 1 when estado = centigrados and temperatura_spi(8) = '1' else
-              temperatura_spi(8) & temperatura_spi           when estado = centigrados and temperatura_spi(8) = '0' else
+  temp_abs <= not (signo & temperatura_spi) + 1 when estado = centigrados and signo = '1' else
+              signo & temperatura_spi           when estado = centigrados and signo = '0' else
               -- not (temp_K) + 1                  when estado = kelvin      and signo = '1' else -- Nunca va a ser negativa
               temp_K                            when estado = kelvin                      else
-              not (temp_F) + 1                  when estado = fahrenheit  and temperatura_spi(8) = '1' else
+              not (temp_F) + 1                  when estado = fahrenheit  and signo = '1' else
               temp_F;
   
   temp_BCD_C <= "0100" when temp_abs >= 400 else
