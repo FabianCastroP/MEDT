@@ -13,16 +13,8 @@ entity medt is
     SDAT:     in     std_logic;
     CS:       buffer std_logic;
     CL:       buffer std_logic;
-    display_0: buffer std_logic_vector(6 downto 0);  
-    display_2: buffer std_logic_vector(6 downto 0);
-    display_3: buffer std_logic_vector(6 downto 0);
-    display_4: buffer std_logic_vector(6 downto 0);
-    display_6: buffer std_logic_vector(6 downto 0);
-    display_7: buffer std_logic_vector(6 downto 0)
-
-
-    --temp_BCD: buffer std_logic_vector(11 downto 0)
-    
+    display_out: buffer std_logic_vector(6 downto 0);  
+    sel_display: buffer std_logic_vector(5 downto 0)
   );
 end entity;
 
@@ -39,14 +31,7 @@ architecture estructural of medt is
 
   signal signo:      std_logic;
   signal unidades:   std_logic_vector(1 downto 0);
---  signal display_0:  std_logic_vector(6 downto 0);  
---  signal display_2:  std_logic_vector(6 downto 0);
---  signal display_3:  std_logic_vector(6 downto 0);
---  signal display_4:  std_logic_vector(6 downto 0);
---  signal display_6:  std_logic_vector(6 downto 0);
---  signal display_7:  std_logic_vector(6 downto 0);
---
---
+
 begin
 
   U0:
@@ -108,12 +93,8 @@ begin
     T_tic_spi       => T_tic_spi,
     unidades        => unidades,
     temp_BCD        => temp_BCD,
-    display_0       => display_0,
-    display_2       => display_2,
-    display_3       => display_3,
-    display_4       => display_4,
-    display_6       => display_6,
-    display_7       => display_7
+    display_out     => display_out,
+    sel_display     => sel_display
   );
 
 end estructural;

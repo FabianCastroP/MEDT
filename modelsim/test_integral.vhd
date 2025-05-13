@@ -21,12 +21,8 @@ architecture test of test_integral is
   signal CS:           std_logic;
   signal CL:           std_logic;
   signal unidad:       std_logic_vector(1 downto 0);
-  signal display_0:  std_logic_vector(6 downto 0);  
-  signal display_2:  std_logic_vector(6 downto 0);
-  signal display_3:  std_logic_vector(6 downto 0);
-  signal display_4:  std_logic_vector(6 downto 0);
-  signal display_6:  std_logic_vector(6 downto 0);
-  signal display_7:  std_logic_vector(6 downto 0);
+  signal display_out:  std_logic_vector(6 downto 0);  
+  signal sel_display:  std_logic_vector(5 downto 0);
 
   constant T_clk:      time := 20 ns;      
  
@@ -45,12 +41,8 @@ entity work.medt(estructural)  -- Completar nombre
     CS,            -- buffer
     CL,            -- buffer
   --  unidad,        -- buffer
-    display_0,
-    display_2,
-    display_3,
-    display_4,
-    display_6,
-    display_7
+    display_out,
+    sel_display
   );
  
 process     -- Reloj
