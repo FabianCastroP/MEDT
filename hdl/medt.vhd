@@ -47,7 +47,7 @@ begin
 
   U_1: 
   entity work.temporizador_lectura(rtl)
-  generic map (periodo_2s => 1000)
+  --generic map (periodo_2s => 1000)
   port map(
     clk           => clk,
     nRst          => nRst,
@@ -83,8 +83,8 @@ begin
 
   U_4:
   entity work.control_displays(rtl)
-  generic map( segundo => 500,
-               cambio_display => 20)                
+  --generic map( segundo => 500,
+  --             cambio_display => 20)                
   port map(
     clk             => clk,
     nRst            => nRst,

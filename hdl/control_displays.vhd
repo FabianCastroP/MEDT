@@ -18,7 +18,7 @@ use ieee.std_logic_unsigned.all;
 
 entity control_displays is
  generic( segundo:  natural := 50000000;
-          cambio_display: natural := 250000
+          cambio_display: natural := 50000
          );
  port(clk:         in     std_logic;
       nRst:        in     std_logic;
@@ -194,5 +194,3 @@ begin
   end process;
 
 end rtl;
-
-  
