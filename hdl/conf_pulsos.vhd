@@ -20,7 +20,6 @@ architecture rtl of conf_pulsos is
   signal aux: std_logic;
 
 begin
-  -- Rebotes?
   process(clk, nRst)
   begin
     if nRst = '0' then
@@ -42,7 +41,7 @@ begin
 
   pulsador_der <= '1' when key0 = '0' and aux = '0' else
                   '0';
-  -- Se activa en nRst = '0' 
+
   pulsador_izq <= '1' when key1 = '0' and aux = '0' else
                   '0';
 

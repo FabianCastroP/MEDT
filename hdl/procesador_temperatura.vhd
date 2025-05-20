@@ -1,5 +1,6 @@
 
 
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_signed.all;
@@ -9,27 +10,26 @@ entity procesador_temperatura is
     clk:             in     std_logic;
     nRst:            in     std_logic;
     temperatura_spi: in     std_logic_vector(8 downto 0);  -- C con signo
-    cambio_unidades: in     std_logic;
-    unidad:          buffer std_logic_vector(1 downto 0);
-    signo:           buffer std_logic;
+    cambio_unidades: in     std_logic;                     -- Key1 (izq)
+    unidad:          buffer std_logic_vector(1 downto 0);  
+    signo:           buffer std_logic;                     -- '1' = signo
     temp_BCD:        buffer std_logic_vector(11 downto 0)  -- [0, 423]
   );
 end entity;
 
 architecture rtl of procesador_temperatura is
   type   t_estado is (centigrados, kelvin, fahrenheit);
-  signal estado:      t_estado;
-  -- signal signo:       std_logic;  -- negativo = 1
-  signal temp_K:      std_logic_vector(9 downto 0);   -- [233, 423]
-  signal temp_F_mult: std_logic_vector(13 downto 0);  -- 150*29 = 4350 = 01 0000 1111 1110
-  signal temp_F_div:  std_logic_vector(9 downto 0);
-  signal redondeo:    std_logic;          -- temp_F_div(3 downto 0) 1000 = 0.5 -> redondeo
-  signal temp_F:      std_logic_vector(9 downto 0);   -- [-41, 304]
-  signal temp_abs:    std_logic_vector(9 downto 0);   -- 423 = 01 1010 0111
-  signal temp_BCD_C:  std_logic_vector(3 downto 0);   -- [0, 4]
-  signal aux_temp_BCD_DU: std_logic_vector(8 downto 0);  -- Almacena decenas y unidades [0, 99]
-  signal temp_BCD_D:  std_logic_vector(4 downto 0);   -- [0, 9]
-  signal temp_BCD_U:  std_logic_vector(8 downto 0);   -- [0, 9]
+  signal estado:          t_estado;
+  signal temp_K:          std_logic_vector(9 downto 0);   -- [233, 423]
+  signal temp_F_mult:     std_logic_vector(13 downto 0);  -- 150*29 = 4350 = 01 0000 1111 1110
+  signal temp_F_div:      std_logic_vector(9 downto 0);
+  signal redondeo:        std_logic;                      -- temp_F_div(3 downto 0) 1000 = 0.5 -> redondeo
+  signal temp_F:          std_logic_vector(9 downto 0);   -- [-41, 304]
+  signal temp_abs:        std_logic_vector(9 downto 0);   -- 423 = 01 1010 0111
+  signal temp_BCD_C:      std_logic_vector(3 downto 0);   -- [0, 4]
+  signal aux_temp_BCD_DU: std_logic_vector(8 downto 0);   -- Almacena decenas y unidades [0, 99]
+  signal temp_BCD_D:      std_logic_vector(4 downto 0);   -- [0, 9]
+  signal temp_BCD_U:      std_logic_vector(8 downto 0);   -- [0, 9]
 
   begin
 
@@ -61,13 +61,14 @@ architecture rtl of procesador_temperatura is
             "01" when estado = kelvin      else
             "10";
 
-  signo <= temperatura_spi(8) when estado = centigrados or (estado = fahrenheit and temperatura_spi < -17) else
+  signo <= temperatura_spi(8) when estado = centigrados or 
+                                  (estado = fahrenheit and temperatura_spi < -17) else
            '0';
         
 
   -- Conversion temperatura --
 
-  temp_K <= (signo & temperatura_spi) + 273;
+  temp_K <= (temperatura_spi(8) & temperatura_spi) + 273;
 
   -- Fahrenheit
   -- TF = TCENT*1.8125 + 32
@@ -76,9 +77,9 @@ architecture rtl of procesador_temperatura is
   -- 
   -- Multiplico por 29
   temp_F_mult <= (temperatura_spi(8) & temperatura_spi & "0000") +
-                 (temperatura_spi & "000")  +
-                 (temperatura_spi & "00")   +
-                 (temperatura_spi);
+                                      (temperatura_spi &  "000") +
+                                      (temperatura_spi &   "00") +
+                                      (temperatura_spi);
   
   -- Divido entre 16
   temp_F_div <= temp_F_mult(13 downto 4);
@@ -91,7 +92,6 @@ architecture rtl of procesador_temperatura is
 
   temp_abs <= not (signo & temperatura_spi) + 1 when estado = centigrados and signo = '1' else
               signo & temperatura_spi           when estado = centigrados and signo = '0' else
-              -- not (temp_K) + 1                  when estado = kelvin      and signo = '1' else -- Nunca va a ser negativa
               temp_K                            when estado = kelvin                      else
               not (temp_F) + 1                  when estado = fahrenheit  and signo = '1' else
               temp_F;
@@ -131,9 +131,9 @@ architecture rtl of procesador_temperatura is
                 (aux_temp_BCD_DU - 30) when temp_BCD_D = 3 else
                 (aux_temp_BCD_DU - 20) when temp_BCD_D = 2 else
                 (aux_temp_BCD_DU - 10) when temp_BCD_D = 1 else
-                aux_temp_BCD_DU;
+                 aux_temp_BCD_DU;
 
   temp_BCD <= temp_BCD_C(3 downto 0) & temp_BCD_D(3 downto 0) & temp_BCD_U(3 downto 0);
                 
-
 end rtl;
+
